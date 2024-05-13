@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import cv2, time
 from flirpy.camera.boson_core_edited import Boson
 import numpy as np

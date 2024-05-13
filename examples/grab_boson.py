@@ -1,7 +1,12 @@
+#!/usr/bin/python3
+
 import cv2, time
 from flirpy.camera.boson_core_edited import Boson
 import numpy as np
 import struct
+import csv
+
+csv_filename = "temperature.csv"
 
 
 def get_temperature(img, top_corner: tuple, bottom_corner: tuple):
@@ -32,6 +37,17 @@ def get_temperature(img, top_corner: tuple, bottom_corner: tuple):
     return average_value, max, lowest
 
 
+def write_csv(entry):
+     with open(csv_filename, 'w') as csvfile:
+        # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+    
+        # writing the entry
+        csvwriter.writerow(entry)
+
+fields = ['Sr. No.', 'Max temp', 'Min temp.', 'Average']
+write_csv(fields)
+    
 with Boson() as camera:
     count = 0
     # set it to radiometric mode
@@ -39,7 +55,7 @@ with Boson() as camera:
     command = struct.pack(">H", 2)  # FLR_SYSCTRL_USBIR16_MODE_TLINEAR = 2
     res = camera._send_packet(function_id, data=command)
 
-    # check mode
+    # check mode of camera
     function_id = 0x000E000E
     res = camera._send_packet(function_id)
     res = camera._decode_packet(res, receive_size=4)
@@ -50,7 +66,9 @@ with Boson() as camera:
         img_original = camera.grab().astype(np.float32)
         img = img_original * 0.01
         avg, max, min = get_temperature(img, (0, 0), (400, 400))
-        # print(avg, max, min)
+        rows = [[max, min, avg]]
+        # add to csv file
+        write_csv(rows)
 
         # Rescale to 8 bits
         img = (
@@ -63,7 +81,9 @@ with Boson() as camera:
         # You can also try PLASMA or MAGMA
         img_col = cv2.applyColorMap(img.astype(np.uint8), cv2.COLORMAP_JET)
         filename = str(count) + ".jpeg"
-        cv2.imwrite(filename, img_col)
+
+        # save jpeg image for testing
+        #cv2.imwrite(filename, img_col)
         count = count + 1
         time.sleep(0.1)
 
