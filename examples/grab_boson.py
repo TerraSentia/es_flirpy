@@ -9,6 +9,7 @@ import json
 
 rows = []
 
+
 def get_temperature(img, top_corner: tuple, bottom_corner: tuple):
     img = img[bottom_corner[0] : top_corner[0], bottom_corner[1] : top_corner[1]]
 
@@ -36,6 +37,7 @@ def get_temperature(img, top_corner: tuple, bottom_corner: tuple):
     )
     return average_value, max, lowest
 
+
 def main():
     with Boson() as camera:
         count = 0
@@ -57,16 +59,13 @@ def main():
 
             # add to csv file
             # row = [str(count), str(max), str(min), str(avg)]
-            row = [str(count), str(count +1), str(count +2), str(count +3)]
+            row = [str(count), str(count + 1), str(count + 2), str(count + 3)]
             # test_dictionary = {"no.": count,
             #               "max.": count + 1,
             #               "min.": count + 2,
             #               "avg": count +3}
-            
-            temp_dictionary = {"no.": count + 1,
-                          "max.": max,
-                          "min.": min ,
-                          "avg": avg}
+
+            temp_dictionary = {"no.": count + 1, "max.": max, "min.": min, "avg": avg}
             rows.append(temp_dictionary)
 
             # Rescale to 8 bits
@@ -82,20 +81,22 @@ def main():
             # filename = str(count) + ".jpeg"
 
             # save jpeg image for testing
-            #cv2.imwrite(filename, img_col)
+            # cv2.imwrite(filename, img_col)
             count = count + 1
             time.sleep(0.1)
 
+
 def write_temp_values():
-    with open("temperatures.csv", 'w') as csvfile:
+    with open("temperatures.csv", "w") as csvfile:
         # creating a csv writer object
         csvwriter = csv.writer(csvfile)
-        fields = ['Sr. No.', 'Max temp', 'Min temp.', 'Average']
+        fields = ["Sr. No.", "Max temp", "Min temp.", "Average"]
         csvwriter.writerow(fields)
         # writing the entry
         csvwriter.writerows(rows)
     with open("temperature.json", "w") as jsonfile:
-        json.dump(rows,jsonfile, indent=4)
+        json.dump(rows, jsonfile, indent=4)
+
 
 if __name__ == "__main__":
     try:
